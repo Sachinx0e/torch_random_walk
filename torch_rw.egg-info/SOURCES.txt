@@ -1,8 +1,0 @@
-README.md
-setup.py
-csrc/cpu/rw.cpp
-test/test.py
-torch_rw.egg-info/PKG-INFO
-torch_rw.egg-info/SOURCES.txt
-torch_rw.egg-info/dependency_links.txt
-torch_rw.egg-info/top_level.txt
