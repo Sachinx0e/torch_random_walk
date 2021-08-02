@@ -1,0 +1,17 @@
+Metadata-Version: 2.1
+Name: torch-random-walk
+Version: 0.0.1
+Summary: A pytorch extesion library to perform random walks on graph
+Home-page: https://github.com/pypa/sampleproject
+Author: Sachin Gavali
+Author-email: sachinx0e@gmail.com
+License: UNKNOWN
+Project-URL: Bug Tracker, https://github.com/pypa/sampleproject/issues
+Description: # Pytorch Random Walk
+        Author : Sachin Gavali
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
