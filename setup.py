@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="pytorch_random_walk",
+    name="torch_random_walk",
     version="0.0.1",
     author="Sachin Gavali",
     author_email="sachinx0e@gmail.com",
