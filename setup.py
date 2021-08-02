@@ -1,26 +1,29 @@
 import setuptools
+from torch.utils.cpp_extension import BuildExtension, CppExtension
 
-with open("README.md", "r", encoding="utf-8") as fh:
-    long_description = fh.read()
+
+def get_extension():
+
+    # get the sources
+    sources = [
+        "csrc/cpu/rw.cpp"
+    ]
+
+    extension = CppExtension(
+        'torch_rw',
+        sources
+    )
+
+    return extension
 
 setuptools.setup(
-    name="torch_random_walk",
+    name="torch_rw",
     version="0.0.1",
     author="Sachin Gavali",
     author_email="sachinx0e@gmail.com",
-    description="A pytorch extesion library to perform random walks on graph",
-    long_description=long_description,
-    long_description_content_type="text/markdown",
-    url="https://github.com/pypa/sampleproject",
-    project_urls={
-        "Bug Tracker": "https://github.com/pypa/sampleproject/issues",
-    },
-    classifiers=[
-        "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
-    ],
-    package_dir={"": "src"},
-    packages=setuptools.find_packages(where="src"),
-    python_requires=">=3.8",
+    description="A pytorch extension library to perform random walks on graph",
+    ext_modules=[get_extension()],
+    cmdclass={
+        'build_ext': BuildExtension
+    }
 )
