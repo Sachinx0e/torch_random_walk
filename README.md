@@ -1,2 +1,2 @@
-# PYTORCH RANDOM WALK
+# Pytorch Random Walk
 Author : Sachin Gavali
