@@ -5,7 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "/home/sachin/miniconda3/envs/torch_random_walk/lib/python3.8/site-packages/torch/include",
-                "/home/sachin/miniconda3/envs/torch_random_walk/lib/python3.8/site-packages/torch/include/torch/csrc/api/include"
+                "/home/sachin/miniconda3/envs/torch_random_walk/lib/python3.8/site-packages/torch/include/torch/csrc/api/include",
+                "/home/sachin/miniconda3/envs/torch_random_walk/include/python3.8/"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

@@ -20,9 +20,8 @@ class MainTest(unittest.TestCase):
         edge_index = utils.edge_tensor(graph)
         nodes = utils.nodes_tensor(graph)
 
-        print(edge_index)
-        
-        walks = rw.walk(edge_indices=edge_index,target_nodes=nodes,p=0.5,q=0.5,walk_length=10)
+        walks = rw.walk(edge_indices=edge_index,target_nodes=nodes,p=1.0,q=1.0,walk_length=10)
+        print(walks)
 
         # test that 1 + 1 = 2
         self.assertEqual(5, 5)
