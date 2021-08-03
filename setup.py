@@ -10,7 +10,7 @@ def get_extension():
     ]
 
     extension = CppExtension(
-        'torch_rw',
+        'torch_rw_native',
         sources
     )
 
@@ -22,8 +22,16 @@ setuptools.setup(
     author="Sachin Gavali",
     author_email="sachinx0e@gmail.com",
     description="A pytorch extension library to perform random walks on graph",
+    setup_requires=['pytest-runner'],
+    tests_require=['pytest'],
+    test_suite='tests',
     ext_modules=[get_extension()],
     cmdclass={
         'build_ext': BuildExtension
-    }
+    },
+    test_requires=[
+        'networkx==2.6.2',
+        'pytest==6.2.4',
+        'loguru==0.5.3'
+    ]
 )

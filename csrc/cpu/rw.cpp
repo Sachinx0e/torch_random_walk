@@ -2,8 +2,8 @@
 
 #include <iostream>
 
-torch::Tensor walk(torch::Tensor z) {
-  auto s = torch::sigmoid(z);
+torch::Tensor walk(torch::Tensor edges, torch::Tensor target_nodes, float p, float q, int walk_length) {
+  auto s = torch::sigmoid(edges);
   return (1 - s) * s;
 }
 
