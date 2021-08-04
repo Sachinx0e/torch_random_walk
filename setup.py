@@ -8,10 +8,15 @@ def get_extension():
     sources = [
         "csrc/cpu/rw.cpp"
     ]
+    
+    extra_compile_args = {'cxx': ['-O2']}
+    extra_compile_args['cxx'] += ['-DAT_PARALLEL_OPENMP']
+    extra_compile_args['cxx'] += ['-fopenmp']
 
     extension = CppExtension(
         'torch_rw_native',
-        sources
+        sources,
+        extra_compile_args=extra_compile_args
     )
 
     return extension
