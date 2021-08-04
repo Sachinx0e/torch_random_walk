@@ -3,8 +3,8 @@ import networkx as nx
 
 def to_csr(graph):
     csr = nx.to_scipy_sparse_matrix(graph,format='csr')    
-    row_ptr = torch.Tensor(csr.indptr).contiguous()
-    col_idx = torch.Tensor(csr.indices).contiguous()
+    row_ptr = torch.Tensor(csr.indptr).to(int).contiguous()
+    col_idx = torch.Tensor(csr.indices).to(int).contiguous()
     return row_ptr, col_idx
 
 def nodes_tensor(graph):
