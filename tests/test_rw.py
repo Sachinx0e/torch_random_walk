@@ -71,8 +71,15 @@ class MainTest(unittest.TestCase):
         row_ptr, col_idx = utils.to_csr(graph)
         nodes = utils.nodes_tensor(graph)
 
-        walks = rw.walk(row_ptr=row_ptr,col_idx=col_idx,target_nodes=nodes,p=0.6,q=0.8,walk_length=6,seed=10)
-
+        walks = rw.walk(row_ptr=row_ptr,col_idx=col_idx,target_nodes=nodes,p=0.7,q=0.5,walk_length=6,seed=10)
+        
+        walk_actual = torch.Tensor([[0, 2, 3, 4, 3, 4, 3],
+                                    [1, 2, 1, 2, 1, 0, 4],
+                                    [2, 0, 2, 3, 4, 3, 2],
+                                    [3, 2, 0, 4, 3, 4, 3],
+                                    [4, 0, 4, 0, 2, 3, 4]]).to(int)
+        
+        self.assertTrue(torch.equal(walks,walk_actual),"Biased sampling walks do not match")
 
 if __name__ == '__main__':
     unittest.main()
