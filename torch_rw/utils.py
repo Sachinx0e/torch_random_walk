@@ -1,18 +1,11 @@
 import torch
+import networkx as nx
 
-def edge_tensor(graph):
-    nodes = list(graph.nodes())
-    edges = list(graph.edges())
-    edge_index = []
-    for edge in edges:
-        head_index = nodes.index(edge[0])
-        tail_index = nodes.index(edge[1])
-        edge_index.append([head_index,tail_index])
-
-    # to tensor
-    edge_tensor = torch.LongTensor(edge_index)
-    return edge_tensor
-
+def to_csr(graph):
+    csr = nx.to_scipy_sparse_matrix(graph,format='csr')    
+    row_ptr = torch.Tensor(csr.indptr)
+    col_idx = torch.Tensor(csr.indices)
+    return row_ptr, col_idx
 
 def nodes_tensor(graph):
     nodes = list(graph.nodes())
