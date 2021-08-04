@@ -2,10 +2,8 @@
 
 #include <iostream>
 
-int64_t sample_neighbor(int64_t target_node, const torch::Tensor *row_ptr, const torch::Tensor *column_idx, const int seed) {
-  // set the seed
-  srand(seed);
-
+int64_t sample_neighbor(int64_t target_node, const torch::Tensor *row_ptr, const torch::Tensor *column_idx) {
+  
   // get the row indices
   auto row_start = target_node;
   auto row_end = row_start + 1;
@@ -28,6 +26,9 @@ int64_t sample_neighbor(int64_t target_node, const torch::Tensor *row_ptr, const
 }
 
 void uniform_walk(const torch::Tensor *walks, const torch::Tensor *row_ptr, const torch::Tensor *column_idx,const torch::Tensor *target_nodes, const int seed) {
+
+    //set the seed
+    srand(seed);
 
     // get the walk length
     int64_t walk_length = (*walks).size(1);
@@ -55,7 +56,7 @@ void uniform_walk(const torch::Tensor *walks, const torch::Tensor *row_ptr, cons
           int64_t previous_node = target_node;
           for (int64_t walk_step=1;walk_step < walk_length;walk_step++){
             // sample a neighor
-            int64_t next_node = sample_neighbor(previous_node,row_ptr,column_idx,seed);
+            int64_t next_node = sample_neighbor(previous_node,row_ptr,column_idx);
             walks_for_node[walk_step] = next_node;
 
             // update previous node
