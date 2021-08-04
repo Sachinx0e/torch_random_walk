@@ -72,7 +72,7 @@ class MainTest(unittest.TestCase):
         nodes = utils.nodes_tensor(graph)
 
         walks = rw.walk(row_ptr=row_ptr,col_idx=col_idx,target_nodes=nodes,p=0.7,q=0.5,walk_length=6,seed=10)
-        
+
         walk_actual = torch.Tensor([[0, 2, 3, 4, 3, 4, 3],
                                     [1, 2, 1, 2, 1, 0, 4],
                                     [2, 0, 2, 3, 4, 3, 2],

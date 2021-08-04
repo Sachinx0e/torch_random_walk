@@ -1,5 +1,6 @@
 #include <torch/extension.h>
 #include <iostream>
+#include <thread>
 
 int64_t sample_neighbor(int64_t target_node, const torch::Tensor *row_ptr, const torch::Tensor *column_idx) {
   
@@ -114,10 +115,14 @@ void biased_walk(const torch::Tensor *walks,
     double prob_2 = 1.0/q/max_prob;
     
     // get the step size
-    int grain_size = torch::internal::GRAIN_SIZE;
+    int grain_size = torch::internal::GRAIN_SIZE / walk_length;
+
+    std::cout << grain_size << std::endl;
 
     // loop in parallel
+    //torch::set_num_threads(std::thread::hardware_concurrency());
     torch::parallel_for(0,num_nodes,grain_size,[&](int64_t node_start,int64_t node_end){
+        std::cout << "started" << std::endl;
         for (int64_t node_index = node_start; node_index < node_end;node_index++) {
           
           // get the walk array for this node
