@@ -41,10 +41,16 @@ class MainTest(unittest.TestCase):
         row_ptr, col_idx = utils.to_csr(graph)
         nodes = utils.nodes_tensor(graph)
 
-        walks = rw.walk(row_ptr=row_ptr,col_idx=col_idx,target_nodes=nodes,p=1.0,q=1.0,walk_length=1000)
-        print(walks)
+        walks = rw.walk(row_ptr=row_ptr,col_idx=col_idx,target_nodes=nodes,p=1.0,q=1.0,walk_length=6,seed=10)
+
+        # define actual walks
+        walk_actual =torch.Tensor([[0, 2, 1, 2, 1, 2, 1],
+        [1, 2, 1, 2, 1, 2, 1],
+        [2, 1, 2, 1, 2, 1, 2],
+        [3, 2, 1, 2, 1, 2, 1],
+        [4, 3, 2, 1, 2, 1, 2]]).to(int)
         
-        self.assertEqual(walks.shape,(len(nodes),1001))
+        self.assertTrue(torch.equal(walks,walk_actual))
 
 
 if __name__ == '__main__':
