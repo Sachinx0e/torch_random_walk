@@ -25,7 +25,9 @@ def get_neighbors(node, nodes, row_ptr, col_idx):
     return neighbors_name    
 
 class MainTest(unittest.TestCase):
-    def test_add(self):
+
+
+    def test_uniform_walk(self):
         graph = nx.Graph()
 
         # add edge
@@ -50,7 +52,7 @@ class MainTest(unittest.TestCase):
         [3, 2, 1, 2, 1, 2, 1],
         [4, 3, 2, 1, 2, 1, 2]]).to(int)
         
-        self.assertTrue(torch.equal(walks,walk_actual))
+        self.assertTrue(torch.equal(walks,walk_actual),"Uniform sampling walks do not match")
 
 
 if __name__ == '__main__':
