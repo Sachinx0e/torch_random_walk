@@ -114,6 +114,37 @@ class MainTest(unittest.TestCase):
         
         self.assertTrue(torch.equal(walks,walk_actual),"Biased sampling walks do not match")
 
+    def test_biased_walk_gpu(self):
+        graph = nx.Graph()
+
+        # add edge
+        graph.add_edge("A","B")
+        graph.add_edge("A","C")
+        graph.add_edge("B","C")
+        graph.add_edge("B","D")
+        graph.add_edge("D","C")
+        graph.add_edge("E","A")
+        graph.add_edge("E","D")
+
+        # get csr
+        row_ptr, col_idx = utils.to_csr(graph)
+        nodes = utils.nodes_tensor(graph)
+
+        # move tensors to gpu
+        row_ptr = row_ptr.to("cuda")
+        col_idx = col_idx.to("cuda")
+        nodes = nodes.to("cuda")
+
+        walks = rw.walk(row_ptr=row_ptr,col_idx=col_idx,target_nodes=nodes,p=0.7,q=0.5,walk_length=6,seed=10)
+
+        walk_actual = torch.Tensor([[0, 4, 0, 1, 0, 2, 0],
+                                    [1, 3, 4, 0, 4, 0, 2],
+                                    [2, 0, 4, 0, 1, 2, 0],
+                                    [3, 4, 0, 4, 3, 1, 3],
+                                    [4, 3, 2, 0, 4, 0, 4]]).to(int).to("cuda")
+        
+        self.assertTrue(torch.equal(walks,walk_actual),"Biased sampling walks do not match")
+
 if __name__ == '__main__':
     unittest.main()
 

@@ -18,7 +18,7 @@ __device__ int64_t sample_neighbor_gpu(int64_t target_node,
     auto column_start = row_accessor[row_start];
     auto column_end = row_accessor[row_end];
 
-    auto nbr_idx = column_start + ( curand(rand_state) % ((column_end) - column_start));
+    auto nbr_idx = column_start + (curand(rand_state) % ((column_end) - column_start));
 
     // check bounds
     if(nbr_idx >= 0 && nbr_idx < col_length){
@@ -27,6 +27,32 @@ __device__ int64_t sample_neighbor_gpu(int64_t target_node,
     }else{
       return -1;
     } 
+}
+
+__device__ bool is_neighbor_gpu(int64_t new_node,
+                 int64_t previous_node,
+                 const torch::PackedTensorAccessor64<int64_t,1> row_accessor,
+                 const torch::PackedTensorAccessor64<int64_t,1> col_accessor,
+                 const int col_length) {
+  
+  // get the row indices
+  auto row_start = previous_node;
+  auto row_end = row_start + 1;
+
+  // get the column indices
+  auto column_start = row_accessor[row_start];
+  auto column_end = row_accessor[row_end];
+
+  // get the neighbors
+  for(int64_t i = column_start;i<column_end;i++){
+    auto node = col_accessor[i];
+    if(node==new_node){
+      return true;
+    }
+  }
+
+  return false;
+
 }
 
 __global__ void uniform_walk_gpu(const torch::PackedTensorAccessor64<int64_t,2> walks,
@@ -69,6 +95,92 @@ __global__ void uniform_walk_gpu(const torch::PackedTensorAccessor64<int64_t,2> 
         }
     }   
 }
+
+__global__ void biased_walk_gpu(const torch::PackedTensorAccessor64<int64_t,2> walks,
+                            const torch::PackedTensorAccessor64<int64_t,1> row_ptr,
+                            const torch::PackedTensorAccessor64<int64_t,1> col_idx,
+                            const torch::PackedTensorAccessor64<int64_t,1> target_nodes,
+                            const int walk_length,
+                            const int num_nodes,
+                            const int col_length,
+                            const double p,
+                            const double q,
+                            const int seed) {
+    
+  // get the thread
+  const auto thread_index = blockIdx.x * blockDim.x + threadIdx.x;
+
+  // seed rng
+  curandState_t rand_state;
+  curand_init(seed,thread_index,0,&rand_state);
+
+  // normalize rejection probs
+  double max_prob_init = fmax(1.0/p,1);
+  double max_prob = fmax(max_prob_init,1.0/q);
+  double prob_0 = 1.0/p/max_prob;
+  double prob_1 = 1.0/max_prob;
+  double prob_2 = 1.0/q/max_prob;
+
+
+  // bound check
+  if(thread_index < num_nodes) {
+    // get the walk array for this node
+    auto walks_for_node = walks[thread_index];
+    
+    // get the target node
+    int64_t target_node = target_nodes[thread_index];
+
+    // add target node as the first node in walk
+    walks_for_node[0] = target_node;
+
+    // sample the first neighbor
+    walks_for_node[1] = sample_neighbor_gpu(target_node,row_ptr,col_idx,col_length,&rand_state);
+
+    // start walk
+    int64_t previous_node = walks_for_node[1];
+    for(int64_t walk_step = 2; walk_step< walk_length;walk_step++){
+      int64_t selected_node = -1;
+      
+      // rejection sampling
+      while(true) {
+
+        // sample a new neighbor
+        int64_t new_node = sample_neighbor_gpu(previous_node,row_ptr,col_idx,col_length,&rand_state);
+        auto random_prob = curand_uniform(&rand_state);
+
+        // t_node
+        int64_t t_node = walks_for_node[walk_step-2];
+      
+        // new_node is the same as previous to previous node, so go back.
+        if(new_node == t_node) {
+          if(random_prob < prob_0){
+              selected_node = new_node;
+              break;
+          }
+        }
+
+        // else if new_node and t_node are neighbors i.e distance is 1
+        else if(is_neighbor_gpu(new_node,t_node,row_ptr,col_idx,col_length)){
+          if(random_prob < prob_1) {
+            selected_node = new_node;
+            break;
+          }
+        }
+
+        // else distance is 2
+        else if(random_prob < prob_2){
+          selected_node = new_node;
+          break;
+        }
+
+        
+
+      } // end while
+      walks_for_node[walk_step] = selected_node;           
+      previous_node = selected_node;
+    }
+  }
+}   
 
 torch::Tensor walk_gpu(const torch::Tensor *row_ptr,
                   const torch::Tensor *column_idx,
@@ -118,7 +230,16 @@ torch::Tensor walk_gpu(const torch::Tensor *row_ptr,
                                                 col_length,
                                                 seed);
   }else{
-    //biased_walk(&walks,row_ptr,column_idx,target_nodes,p,q,seed);
+    biased_walk_gpu<<<NUM_BLOCKS,NUM_THREADS>>>(walks_accessor,
+                                                row_ptr_accessor,
+                                                col_idx_accessor,
+                                                target_nodes_accesor,
+                                                walk_size,
+                                                num_nodes,
+                                                col_length,
+                                                p,
+                                                q,
+                                                seed);
   }
   return walks;
 }
