@@ -3,10 +3,12 @@ Author : Sachin Gavali
 
 
 ## Requirements
+```
 1. Pytorch >= 1.9.0
 2. NVIDIA-GPU (Cuda Toolkit >= 10.1)
 3. AMD-GPU (ROCM == 4.0.1)
 4. Python == 3.8
+```
 
 ## Peform Random Walk
 
