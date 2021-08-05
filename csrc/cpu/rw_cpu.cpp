@@ -16,7 +16,7 @@ int64_t sample_neighbor(int64_t target_node,
   auto column_start = row_accessor[row_start];
   auto column_end = row_accessor[row_end];
 
-  auto nbr_idx = column_start + ( std::rand() % ( (column_end-1) - column_start + 1 ));
+  auto nbr_idx = column_start + ( std::rand() % ( (column_end) - column_start));
 
   // check bounds
   if(nbr_idx >= 0 && nbr_idx < col_length){

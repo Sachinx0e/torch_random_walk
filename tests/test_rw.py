@@ -75,20 +75,17 @@ class MainTest(unittest.TestCase):
         row_ptr = row_ptr.to("cuda")
         col_idx = col_idx.to("cuda")
         nodes = nodes.to("cuda")
-        nodes = nodes.repeat(10000)
 
         walks = rw.walk(row_ptr=row_ptr,col_idx=col_idx,target_nodes=nodes,p=1.0,q=1.0,walk_length=6,seed=10)
 
         # define actual walks
-        walk_actual =torch.Tensor([[0, 2, 1, 3, 4, 0, 4],
-        [1, 3, 2, 3, 4, 3, 4],
-        [2, 0, 1, 3, 2, 0, 2],
-        [3, 4, 0, 1, 2, 1, 2],
-        [4, 0, 4, 0, 2, 1, 0]]).to(int).to("cuda")
+        walk_actual =torch.Tensor([[0, 4, 0, 1, 3, 4, 3],
+        [1, 3, 4, 0, 4, 0, 4],
+        [2, 0, 4, 3, 1, 0, 1],
+        [3, 4, 0, 2, 3, 1, 3],
+        [4, 3, 4, 3, 2, 3, 1]]).to(int).to("cuda")
 
-        print(walks)
-
-        self.assertTrue(torch.equal(walks,walk_actual),"Uniform sampling walks do not match")
+        self.assertTrue(torch.equal(walks,walk_actual),"Uniform sampling walks do not match for gpu")
 
 
     def test_biased_walk(self):
