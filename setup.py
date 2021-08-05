@@ -57,6 +57,12 @@ setuptools.setup(
     cmdclass={
         'build_ext': BuildExtension
     },
+    install_requires=[
+        'networkx==2.6.2',
+        'pytest==6.2.4',
+        'loguru==0.5.3',
+        'scipy==1.7.1'
+    ],
     test_requires=[
         'networkx==2.6.2',
         'pytest==6.2.4',
