@@ -2,6 +2,7 @@ import setuptools
 from torch.utils.cpp_extension import BuildExtension, CppExtension, CUDAExtension
 import glob
 import os
+import torch
 
 def get_extension():
 
@@ -21,13 +22,23 @@ def get_extension():
     define_macros += [('WITH_CUDA', None)]
     nvcc_flags = os.getenv('NVCC_FLAGS', '')
     nvcc_flags = [] if nvcc_flags == '' else nvcc_flags.split(' ')
-    nvcc_flags += ['-arch=sm_35', '--expt-relaxed-constexpr', '-O2']
+    nvcc_flags += ['-arch=sm_35', '-O2']
     extra_compile_args['nvcc'] = nvcc_flags
+
+    # set include dirs
+    include_dirs = ["csrc"]
+
+    if torch.cuda.is_available() and torch.version.hip:
+        # add rocrand headers
+        include_dirs.extend([
+            "/opt/rocm/include/rocrand",
+            "/opt/rocm/include/hiprand"
+        ])
 
     extension = CUDAExtension(
         'torch_rw_native',
         sources=sources,
-        include_dirs=["csrc"],
+        include_dirs=include_dirs,
         extra_compile_args=extra_compile_args
     )
 

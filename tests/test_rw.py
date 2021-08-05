@@ -79,11 +79,18 @@ class MainTest(unittest.TestCase):
         walks = rw.walk(row_ptr=row_ptr,col_idx=col_idx,target_nodes=nodes,p=1.0,q=1.0,walk_length=6,seed=10)
 
         # define actual walks
-        walk_actual =torch.Tensor([[0, 4, 0, 1, 3, 4, 3],
-        [1, 3, 4, 0, 4, 0, 4],
-        [2, 0, 4, 3, 1, 0, 1],
-        [3, 4, 0, 2, 3, 1, 3],
-        [4, 3, 4, 3, 2, 3, 1]]).to(int).to("cuda")
+        if torch.version.cuda:
+            walk_actual =torch.Tensor([[0, 4, 0, 1, 3, 4, 3],
+                                        [1, 3, 4, 0, 4, 0, 4],
+                                        [2, 0, 4, 3, 1, 0, 1],
+                                        [3, 4, 0, 2, 3, 1, 3],
+                                        [4, 3, 4, 3, 2, 3, 1]]).to(int).to("cuda")
+        else:
+            walk_actual =torch.Tensor([[0, 4, 3, 4, 3, 4, 3],
+                                    [1, 3, 2, 0, 4, 3, 1],
+                                    [2, 0, 2, 3, 4, 3, 2],
+                                    [3, 2, 1, 0, 2, 0, 1],
+                                    [4, 0, 4, 3, 1, 0, 2]]).to(int).to("cuda")
 
         self.assertTrue(torch.equal(walks,walk_actual),"Uniform sampling walks do not match for gpu")
 
@@ -137,11 +144,19 @@ class MainTest(unittest.TestCase):
 
         walks = rw.walk(row_ptr=row_ptr,col_idx=col_idx,target_nodes=nodes,p=0.7,q=0.5,walk_length=6,seed=10)
 
-        walk_actual = torch.Tensor([[0, 4, 0, 1, 0, 2, 0],
-                                    [1, 3, 4, 0, 4, 0, 2],
-                                    [2, 0, 4, 0, 1, 2, 0],
-                                    [3, 4, 0, 4, 3, 1, 3],
-                                    [4, 3, 2, 0, 4, 0, 4]]).to(int).to("cuda")
+        if torch.version.cuda:
+            walk_actual = torch.Tensor([[0, 4, 0, 1, 0, 2, 0],
+                                            [1, 3, 4, 0, 4, 0, 2],
+                                            [2, 0, 4, 0, 1, 2, 0],
+                                            [3, 4, 0, 4, 3, 1, 3],
+                                            [4, 3, 2, 0, 4, 0, 4]]).to(int).to("cuda")
+        else:
+            walk_actual = torch.Tensor([[0, 4, 3, 1, 0, 4, 0],
+                                        [1, 3, 2, 0, 4, 0, 1],
+                                        [2, 0, 2, 3, 2, 0, 2],
+                                        [3, 2, 1, 2, 0, 1, 0],
+                                        [4, 0, 1, 2, 1, 0, 1]]).to(int).to("cuda")
+
         
         self.assertTrue(torch.equal(walks,walk_actual),"Biased sampling walks do not match")
 
