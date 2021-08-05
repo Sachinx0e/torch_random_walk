@@ -1,4 +1,4 @@
-#include <torch/extension.h>
+#include "rw_cpu.h"
 #include <iostream>
 #include <thread>
 #include <random>
@@ -200,7 +200,14 @@ void biased_walk(const torch::Tensor *walks,
     });
 }
 
-torch::Tensor walk(const torch::Tensor *row_ptr, const torch::Tensor *column_idx, const torch::Tensor *target_nodes, const double p, const double q, const int walk_length, const int seed) {
+torch::Tensor walk_cpu(const torch::Tensor *row_ptr,
+                  const torch::Tensor *column_idx,
+                  const torch::Tensor *target_nodes,
+                  const double p,
+                  const double q,
+                  const int walk_length,
+                  const int seed) {
+
   // construct a tensor to hold the walks
   auto walk_size = walk_length + 1;  
   auto walks = torch::empty({(*target_nodes).size(0),walk_size},torch::kInt64); 
@@ -212,8 +219,4 @@ torch::Tensor walk(const torch::Tensor *row_ptr, const torch::Tensor *column_idx
     biased_walk(&walks,row_ptr,column_idx,target_nodes,p,q,seed);
   }
   return walks;
-}
-
-PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
-  m.def("walk", &walk, "walk");
 }

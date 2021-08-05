@@ -27,7 +27,7 @@ def get_neighbors(node, nodes, row_ptr, col_idx):
 class MainTest(unittest.TestCase):
 
 
-    def test_uniform_walk(self):
+    def test_uniform_walk_cpu(self):
         graph = nx.Graph()
 
         # add edge
@@ -51,6 +51,42 @@ class MainTest(unittest.TestCase):
         [2, 0, 1, 3, 2, 0, 2],
         [3, 4, 0, 1, 2, 1, 2],
         [4, 0, 4, 0, 2, 1, 0]]).to(int)
+
+        self.assertTrue(torch.equal(walks,walk_actual),"Uniform sampling walks do not match")
+
+
+    def test_uniform_walk_gpu(self):
+        graph = nx.Graph()
+
+        # add edge
+        graph.add_edge("A","B")
+        graph.add_edge("A","C")
+        graph.add_edge("B","C")
+        graph.add_edge("B","D")
+        graph.add_edge("D","C")
+        graph.add_edge("E","A")
+        graph.add_edge("E","D")
+
+        # get csr
+        row_ptr, col_idx = utils.to_csr(graph)
+        nodes = utils.nodes_tensor(graph)
+
+        # move all tensors to gpu
+        row_ptr = row_ptr.to("cuda")
+        col_idx = col_idx.to("cuda")
+        nodes = nodes.to("cuda")
+        nodes = nodes.repeat(10000)
+
+        walks = rw.walk(row_ptr=row_ptr,col_idx=col_idx,target_nodes=nodes,p=1.0,q=1.0,walk_length=6,seed=10)
+
+        # define actual walks
+        walk_actual =torch.Tensor([[0, 2, 1, 3, 4, 0, 4],
+        [1, 3, 2, 3, 4, 3, 4],
+        [2, 0, 1, 3, 2, 0, 2],
+        [3, 4, 0, 1, 2, 1, 2],
+        [4, 0, 4, 0, 2, 1, 0]]).to(int).to("cuda")
+
+        print(walks)
 
         self.assertTrue(torch.equal(walks,walk_actual),"Uniform sampling walks do not match")
 

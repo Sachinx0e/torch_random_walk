@@ -1,21 +1,33 @@
 import setuptools
-from torch.utils.cpp_extension import BuildExtension, CppExtension
-
+from torch.utils.cpp_extension import BuildExtension, CppExtension, CUDAExtension
+import glob
+import os
 
 def get_extension():
 
     # get the sources
-    sources = [
-        "csrc/cpu/rw.cpp"
-    ]
-    
+    sources = glob.glob('csrc/**/*.cpp',recursive=True)
+    sources_cuda = glob.glob('csrc/**/*.cu',recursive=True)   
+
+    sources.extend(sources_cuda)
+
+    # openmp
     extra_compile_args = {'cxx': ['-O2']}
     extra_compile_args['cxx'] += ['-DAT_PARALLEL_OPENMP']
     extra_compile_args['cxx'] += ['-fopenmp']
 
-    extension = CppExtension(
+    # cuda
+    define_macros = []
+    define_macros += [('WITH_CUDA', None)]
+    nvcc_flags = os.getenv('NVCC_FLAGS', '')
+    nvcc_flags = [] if nvcc_flags == '' else nvcc_flags.split(' ')
+    nvcc_flags += ['-arch=sm_35', '--expt-relaxed-constexpr', '-O2']
+    extra_compile_args['nvcc'] = nvcc_flags
+
+    extension = CUDAExtension(
         'torch_rw_native',
-        sources,
+        sources=sources,
+        include_dirs=["csrc"],
         extra_compile_args=extra_compile_args
     )
 
