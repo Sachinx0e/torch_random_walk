@@ -1,4 +1,5 @@
 import setuptools
+from setuptools import find_packages
 from torch.utils.cpp_extension import BuildExtension, CppExtension, CUDAExtension
 import glob
 import os
@@ -12,8 +13,7 @@ def get_extension():
     # get the cuda sources
     if torch.cuda.is_available() and torch.version.cuda:
         sources_cuda = glob.glob('csrc/**/*.cu',recursive=True)   
-
-    sources.extend(sources_cuda)
+        sources.extend(sources_cuda)
 
     # openmp
     extra_compile_args = {'cxx': ['-O2']}
@@ -70,5 +70,6 @@ setuptools.setup(
         'networkx==2.6.2',
         'pytest==6.2.4',
         'loguru==0.5.3'
-    ]
+    ],
+    packages=find_packages(),
 )
