@@ -1,5 +1,4 @@
 #!/bin/bash
-export FORCE_CUDA=0
 export MAX_JOBS=8
 rm -r build
 python setup.py clean

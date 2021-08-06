@@ -8,7 +8,10 @@ def get_extension():
 
     # get the sources
     sources = glob.glob('csrc/**/*.cpp',recursive=True)
-    sources_cuda = glob.glob('csrc/**/*.cu',recursive=True)   
+
+    # get the cuda sources
+    if torch.cuda.is_available() and torch.version.cuda:
+        sources_cuda = glob.glob('csrc/**/*.cu',recursive=True)   
 
     sources.extend(sources_cuda)
 
