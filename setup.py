@@ -14,6 +14,11 @@ def get_extension():
     if torch.cuda.is_available() and torch.version.cuda:
         sources_cuda = glob.glob('csrc/**/*.cu',recursive=True)   
         sources.extend(sources_cuda)
+    else:
+        sources_hip = glob.glob('csrc/**/*.hip',recursive=True)   
+        sources.extend(sources_hip)
+
+    print(sources)
 
     # openmp
     extra_compile_args = {'cxx': ['-O2']}
