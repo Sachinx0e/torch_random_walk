@@ -2,6 +2,7 @@
 #include "cpu/rw_cpu.h"
 #include "cuda/rw_cuda.h"
 #include "cpu/windows_cpu.h"
+#include "cuda/windows_cuda.h"
 
 torch::Tensor walk(const torch::Tensor *row_ptr,
                   const torch::Tensor *column_idx,
@@ -21,13 +22,14 @@ torch::Tensor walk(const torch::Tensor *row_ptr,
 
 std::vector<torch::Tensor> to_windows(const torch::Tensor *walks,
                                       const int window_size,
-                                      const int num_nodes
+                                      const int64_t num_nodes,
+                                      const int seed
                                     )
 {
   if(walks->device().is_cuda()) {
-    return {};
+    return to_windows_gpu(walks,window_size,num_nodes,seed);
   }else{
-    return to_windows_cpu(walks,window_size,num_nodes);
+    return to_windows_cpu(walks,window_size,num_nodes,seed);
   }
 }
 

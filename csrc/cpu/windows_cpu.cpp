@@ -3,12 +3,15 @@
 
 std::vector<torch::Tensor> to_windows_cpu(const torch::Tensor *walks,
                         const int window_size,
-                        const int num_nodes){
+                        const int64_t num_nodes,
+                        const int seed
+                        ){
+
+    // seed
+    srand(seed);
 
     // check walks is contiguous
     CHECK_CONTIGUOUS(walks);
-
-    std::cout << walks->is_contiguous() << std::endl; 
 
     // calculate sizes
     int64_t num_walks = walks->size(0);
@@ -61,10 +64,9 @@ std::vector<torch::Tensor> to_windows_cpu(const torch::Tensor *walks,
                                 
                 // create negative window
                 auto neg_windows = neg_windows_accesor[target_node_pos]; 
-                auto rand_tensor = torch::randint(num_nodes,{window_size-1},torch::kInt64);
-                auto rand_accessor = rand_tensor.accessor<int64_t,1>();
                 for(int i = 0;i<window_size-1;i++){
-                    neg_windows[i] = rand_accessor[i];
+                    auto nbr_node = 0 + ( std::rand() % ( (num_nodes) - 0));
+                    neg_windows[i] = nbr_node;
                 }
             }
         }
