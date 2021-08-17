@@ -143,7 +143,6 @@ void biased_walk(const torch::Tensor *walks,
 
     // loop in parallel
     torch::parallel_for(0,num_nodes,grain_size,[&](int64_t node_start,int64_t node_end){
-        std::cout << "started" << std::endl;
         for (int64_t node_index = node_start; node_index < node_end;node_index++) {
           
           // get the walk array for this node
