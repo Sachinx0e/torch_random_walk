@@ -49,12 +49,20 @@ def test_to_windows_gpu():
                                         [24, 20,  6, 27],
                                         [20, 13, 27,  0]]).to(int).to("cuda")
 
-    neg_windows_expected = torch.Tensor([[16,  8, 18, 28],
-                                        [18,  2, 14, 12],
-                                        [28,  1, 20, 23],
-                                        [ 1, 29, 29, 16],
-                                        [28, 16, 10, 16],
-                                        [ 0,  2,  7, 14]]).to(int).to("cuda")
+    if torch.version.cuda:
+        neg_windows_expected = torch.Tensor([[11, 27, 29, 14],
+                                            [ 1, 12, 23, 24],
+                                            [20, 22, 10,  7],
+                                            [23, 29, 17, 19],
+                                            [11, 27,  8,  4],
+                                            [23,  6,  0,  8]]).to(int).to("cuda")
+    else:
+        neg_windows_expected = torch.Tensor([[16,  8, 18, 28],
+                                            [18,  2, 14, 12],
+                                            [28,  1, 20, 23],
+                                            [ 1, 29, 29, 16],
+                                            [28, 16, 10, 16],
+                                            [ 0,  2,  7, 14]]).to(int).to("cuda")
 
     
     
