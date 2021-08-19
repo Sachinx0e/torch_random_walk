@@ -20,7 +20,7 @@ torch::Tensor walk(const torch::Tensor *row_ptr,
   }
 }
 
-std::vector<torch::Tensor> to_windows(const torch::Tensor *walks,
+std::tuple<at::Tensor, at::Tensor, at::Tensor> to_windows(const torch::Tensor *walks,
                                       const int window_size,
                                       const int64_t num_nodes,
                                       const int seed

@@ -63,7 +63,7 @@ __global__ void create_windows(torch::PackedTensorAccessor64<int64_t,2> walks_ac
     }
 }
 
-std::vector<torch::Tensor> to_windows_gpu(const torch::Tensor *walks,
+std::tuple<at::Tensor, at::Tensor, at::Tensor> to_windows_gpu(const torch::Tensor *walks,
                         const int window_size,
                         const int64_t num_nodes,
                         const int seed
@@ -112,5 +112,5 @@ std::vector<torch::Tensor> to_windows_gpu(const torch::Tensor *walks,
                                             seed
                                         );
     
-    return {target_nodes,pos_windows,neg_windows};
+    return std::make_tuple(target_nodes,pos_windows,neg_windows);
 }
