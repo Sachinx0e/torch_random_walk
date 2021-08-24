@@ -2,6 +2,7 @@
 #include "utils.cuh"
 #include <curand.h>
 #include <curand_kernel.h>
+#include <ATen/cuda/CUDAContext.h>
 
 __global__ void create_windows(torch::PackedTensorAccessor64<int64_t,2> walks_accessor,
                                const int num_walks,
@@ -98,9 +99,11 @@ std::tuple<at::Tensor, at::Tensor, at::Tensor> to_windows_gpu(const torch::Tenso
 
     // Grid size
     int NUM_BLOCKS = int((num_walks + NUM_THREADS - 1)/NUM_THREADS);
+
+    auto stream = at::cuda::getCurrentCUDAStream();
     
     // launch kernel
-    create_windows<<<NUM_BLOCKS,NUM_THREADS>>>(walks_accessor,
+    create_windows<<<NUM_BLOCKS,NUM_THREADS,0,stream>>>(walks_accessor,
                                             num_walks,
                                             walk_length,
                                             window_size,

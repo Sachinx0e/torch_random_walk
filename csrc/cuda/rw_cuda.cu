@@ -219,9 +219,11 @@ torch::Tensor walk_gpu(const torch::Tensor *row_ptr,
   // Grid size
   int NUM_BLOCKS = int((num_nodes + NUM_THREADS - 1)/NUM_THREADS);
   
+  auto stream = at::cuda::getCurrentCUDAStream();
+
   // perform walks
   if(p == 1.0 && q == 1.0){
-    uniform_walk_gpu<<<NUM_BLOCKS,NUM_THREADS>>>(walks_accessor,
+    uniform_walk_gpu<<<NUM_BLOCKS,NUM_THREADS,0,stream>>>(walks_accessor,
                                                 row_ptr_accessor,
                                                 col_idx_accessor,
                                                 target_nodes_accesor,
@@ -230,7 +232,7 @@ torch::Tensor walk_gpu(const torch::Tensor *row_ptr,
                                                 col_length,
                                                 seed);
   }else{
-    biased_walk_gpu<<<NUM_BLOCKS,NUM_THREADS>>>(walks_accessor,
+    biased_walk_gpu<<<NUM_BLOCKS,NUM_THREADS,0,stream>>>(walks_accessor,
                                                 row_ptr_accessor,
                                                 col_idx_accessor,
                                                 target_nodes_accesor,
