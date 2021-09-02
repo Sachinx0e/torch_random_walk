@@ -63,7 +63,7 @@ def get_extension():
 
 setuptools.setup(
     name="torch_rw",
-    version="0.0.9",
+    version="0.1.0",
     author="Sachin Gavali",
     author_email="sachinx0e@gmail.com",
     description="A pytorch extension library to perform random walks on graph",
