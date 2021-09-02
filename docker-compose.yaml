@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+  torch-rw:
+    image: "sachinx0e/torch-rw:1.1"
+    container_name: "torch-rw"
+    tty: true
+    stdin_open: true
+    ipc: host
+    shm_size: 256m
+    volumes: 
+      - .:/root/workdir
+      - ~/.ssh:/root/.ssh
+      - ~/docker/.vscode-server:/root/.vscode-server
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - capabilities: [gpu]

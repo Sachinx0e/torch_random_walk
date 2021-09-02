@@ -17,7 +17,6 @@ pytest==6.2.4
 scipy==1.7.1
 six @ file:///tmp/build/80754af9/six_1623709665295/work
 toml==0.10.2
-torch==1.9.0
 torchaudio==0.9.0a0+33b2469
 torchvision==0.10.0
 typing-extensions @ file:///tmp/build/80754af9/typing_extensions_1624965014186/work
