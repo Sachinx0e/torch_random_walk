@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   torch-rw:
-    image: "sachinx0e/torch-rw:1.1"
+    image: "sachinx0e/torch-rw:1.2"
     container_name: "torch-rw"
     tty: true
     stdin_open: true
@@ -10,7 +10,7 @@ services:
     volumes: 
       - .:/root/workdir
       - ~/.ssh:/root/.ssh
-      - ~/docker/.vscode-server:/root/.vscode-server
+      - ~/docker/torch_rw/.vscode-server:/root/.vscode-server
     deploy:
       resources:
         reservations:

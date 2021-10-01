@@ -160,6 +160,7 @@ class MainTest(unittest.TestCase):
         
         self.assertTrue(torch.equal(walks,walk_actual),"Biased sampling walks do not match")
 
+
 if __name__ == '__main__':
     unittest.main()
 

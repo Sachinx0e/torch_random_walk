@@ -224,3 +224,29 @@ torch::Tensor walk_cpu(const torch::Tensor *row_ptr,
   }
   return walks;
 }
+
+
+torch::Tensor walk_edge_list_cpu(const torch::Tensor *edge_list,
+                  const torch::Tensor *node_edges_idx,
+                  const torch::Tensor *target_nodes,
+                  const double p,
+                  const double q,
+                  const int walk_length,
+                  const int seed) {
+
+  CHECK_CPU((*row_ptr));
+  CHECK_CPU((*column_idx));
+  CHECK_CPU((*target_nodes));
+
+  // construct a tensor to hold the walks
+  auto walk_size = walk_length + 1;  
+  auto walks = torch::empty({(*target_nodes).size(0),walk_size},torch::kInt64); 
+  
+  // perform walks
+  if(p == 1.0 && q == 1.0){
+    //uniform_walk_edge_list(&walks,edge_list,target_nodes,seed);
+  }else{
+    //biased_walk(&walks,row_ptr,column_idx,target_nodes,p,q,seed);
+  }
+  return walks;
+}

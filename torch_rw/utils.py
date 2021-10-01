@@ -15,3 +15,74 @@ def nodes_tensor(graph):
 
     nodes_t = torch.LongTensor(nodes_index).contiguous()
     return nodes_t
+
+
+def to_edge_list_indexed(graph):
+    edges = list(graph.edges())
+    print(edges)
+    nodes = sorted(list(graph.nodes()))
+    node_index_mapping = {}
+    
+    edge_list_indexed = torch.zeros((len(edges),2)).to(int).contiguous()
+
+    for index, edge in enumerate(edges):
+        head = edge[0]
+        tail = edge[1]
+
+        head_index = -1
+        if head in node_index_mapping:
+            head_index = node_index_mapping[head]
+        else:
+            head_index = nodes.index(head)
+            node_index_mapping[head] = head_index
+
+        tail_index = -1
+        if tail in node_index_mapping:
+            tail_index = node_index_mapping[tail]
+        else:
+            tail_index = nodes.index(tail)
+            node_index_mapping[tail] = tail_index
+
+        edge_list_indexed[index][0] = head_index
+        edge_list_indexed[index][1] = tail_index
+
+    return edge_list_indexed, node_index_mapping
+
+def build_node_edge_index(edge_list_indexed):
+
+    # sort the edge list
+    edge_list_indexed,_ = torch.sort(edge_list_indexed,dim=0)
+
+    # get unique nodes
+    nodes_all = edge_list_indexed.view(-1)
+    nodes_unique = torch.unique(nodes_all)
+    nodes_sorted,_ = torch.sort(nodes_unique)
+
+    num_nodes = len(nodes_sorted)
+    num_edges = len(edge_list_indexed)
+    node_edge_index = torch.full((num_nodes,2),-1).to(int).contiguous()
+
+    #print(edge_list_indexed)
+
+    current_node = edge_list_indexed[0][0]
+    for edge_index in range(num_edges):
+        edge = edge_list_indexed[edge_index]
+        head = edge[0]
+
+        if head != current_node:
+            node_edge_index[current_node][1] = edge_index - 1
+            node_edge_index[head] = edge_index
+            current_node = head
+        else:
+            if edge_index == 0:
+                node_edge_index[head][0] = 0
+            else:
+                node_edge_index[head][1] = edge_index
+    
+    return node_edge_index, edge_list_indexed
+            
+
+            
+
+
+

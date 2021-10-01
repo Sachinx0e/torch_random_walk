@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
  && rm -rf /var/lib/apt/lists/*
 
 # Create a working directory
-RUN mkdir -p /root/workdir && mkdir -p /root/.ssh && mkdir -p /root/.vscode-server
+RUN mkdir -p /root/workdir && mkdir -p /root/.ssh && mkdir -p /root/.vscode-server && pip install ninja
 WORKDIR /root/workdir
 
 # Set the default command to python3
