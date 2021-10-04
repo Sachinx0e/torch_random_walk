@@ -19,11 +19,13 @@ def nodes_tensor(graph):
 
 def to_edge_list_indexed(graph):
     edges = list(graph.edges())
-    print(edges)
     nodes = sorted(list(graph.nodes()))
     node_index_mapping = {}
-    
-    edge_list_indexed = torch.zeros((len(edges),2)).to(int).contiguous()
+    is_directed = nx.is_directed(graph)
+
+    edge_list_len = len(edges)
+
+    edge_list_indexed = torch.zeros((edge_list_len,2)).to(int).contiguous()
 
     for index, edge in enumerate(edges):
         head = edge[0]
@@ -45,6 +47,10 @@ def to_edge_list_indexed(graph):
 
         edge_list_indexed[index][0] = head_index
         edge_list_indexed[index][1] = tail_index
+
+    if is_directed == False:
+        edge_list_reversed = torch.fliplr(edge_list_indexed)
+        edge_list_indexed = torch.cat((edge_list_indexed,edge_list_reversed),dim=0)
 
     return edge_list_indexed, node_index_mapping
 
