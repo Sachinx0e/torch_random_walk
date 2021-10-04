@@ -31,8 +31,12 @@ class MainTest(unittest.TestCase):
         node_edge_index, edge_list_indexed = utils.build_node_edge_index(edge_list_indexed)
         print(node_edge_index)
 
-        """walks = rw.walk_edge_list(edge_list_indexed=edge_list_indexed,
-                                  target_nodes=target_nodes,p=1.0,q=1.0,walk_length=6,seed=10)
+        walks = rw.walk_edge_list(edge_list_indexed=edge_list_indexed,
+                                  target_nodes=target_nodes,
+                                  p=1.0,
+                                  q=1.0,
+                                  walk_length=6,
+                                  seed=10)
 
         # define actual walks
         walk_actual =torch.Tensor([[0, 2, 1, 3, 4, 0, 4],
@@ -41,7 +45,7 @@ class MainTest(unittest.TestCase):
         [3, 4, 0, 1, 2, 1, 2],
         [4, 0, 4, 0, 2, 1, 0]]).to(int)
 
-        self.assertTrue(torch.equal(walks,walk_actual),"Uniform sampling walks on edge list do not match")"""
+        self.assertTrue(torch.equal(walks,walk_actual),"Uniform sampling walks on edge list do not match")
 
 if __name__ == '__main__':
     unittest.main()

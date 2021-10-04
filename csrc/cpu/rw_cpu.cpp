@@ -234,8 +234,8 @@ torch::Tensor walk_edge_list_cpu(const torch::Tensor *edge_list,
                   const int walk_length,
                   const int seed) {
 
-  CHECK_CPU((*row_ptr));
-  CHECK_CPU((*column_idx));
+  CHECK_CPU((*edge_list));
+  CHECK_CPU((*node_edges_idx));
   CHECK_CPU((*target_nodes));
 
   // construct a tensor to hold the walks

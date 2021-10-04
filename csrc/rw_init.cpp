@@ -20,7 +20,7 @@ torch::Tensor walk(const torch::Tensor *row_ptr,
   }
 }
 
-torch::Tensor walk_edge_list(const torch::Tensor *edge_list,
+torch::Tensor walk_edge_list(const torch::Tensor *edge_list_indexed,
                   const torch::Tensor *node_edges_idx,
                   const torch::Tensor *target_nodes,
                   const double p,
@@ -29,7 +29,7 @@ torch::Tensor walk_edge_list(const torch::Tensor *edge_list,
                   const int seed)
 {
 
-  if(row_ptr->device().is_cuda()) {
+  if(edge_list_indexed->device().is_cuda()) {
     throw;
   }else{
     return walk_edge_list_cpu(edge_list,node_edges_idx,target_nodes,p,q,walk_length,seed);

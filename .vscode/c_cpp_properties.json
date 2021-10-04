@@ -4,9 +4,11 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/home/sachin/miniconda3/envs/torch_random_walk/lib/python3.8/site-packages/torch/include",
-                "/home/sachin/miniconda3/envs/torch_random_walk/lib/python3.8/site-packages/torch/include/torch/csrc/api/include",
-                "/home/sachin/miniconda3/envs/torch_random_walk/include/python3.8/"
+                "/opt/conda/lib/python3.7/site-packages/torch/include",
+                "/opt/conda/lib/python3.7/site-packages/torch/include/torch/csrc/api/include",
+                "/opt/conda/lib/python3.7/site-packages/torch/include/TH",
+                "/opt/conda/lib/python3.7/site-packages/torch/include/THC",
+                "/usr/local/cuda/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
