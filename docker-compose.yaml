@@ -9,7 +9,7 @@ services:
     shm_size: 256m
     volumes: 
       - .:/root/workdir
-      - ~/.ssh:/root/.ssh
+      - ~/docker/torch_rw/.ssh:/root/.ssh
       - ~/docker/torch_rw/.vscode-server:/root/.vscode-server
     deploy:
       resources:
