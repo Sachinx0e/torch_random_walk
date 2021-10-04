@@ -4,6 +4,7 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
+                "/opt/conda/include/python3.7m/",
                 "/opt/conda/lib/python3.7/site-packages/torch/include",
                 "/opt/conda/lib/python3.7/site-packages/torch/include/torch/csrc/api/include",
                 "/opt/conda/lib/python3.7/site-packages/torch/include/TH",

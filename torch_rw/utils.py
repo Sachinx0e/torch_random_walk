@@ -51,7 +51,7 @@ def to_edge_list_indexed(graph):
 def build_node_edge_index(edge_list_indexed):
 
     # sort the edge list
-    edge_list_indexed,_ = torch.sort(edge_list_indexed,dim=0)
+    edge_list_indexed = torch.stack(sorted(edge_list_indexed, key=lambda a: a[0]))
 
     # get unique nodes
     nodes_all = edge_list_indexed.view(-1)
