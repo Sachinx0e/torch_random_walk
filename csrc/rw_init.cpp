@@ -1,6 +1,7 @@
 #include <torch/extension.h>
 #include "cpu/rw_cpu.h"
 #include "cpu/rw_cpu_edge_list.h"
+#include "cuda/rw_cuda_edge_list.h"
 #include "cuda/rw_cuda.h"
 #include "cpu/windows_cpu.h"
 #include "cuda/windows_cuda.h"
@@ -33,7 +34,7 @@ torch::Tensor walk_edge_list(const torch::Tensor *edge_list_indexed,
 {
 
   if(edge_list_indexed->device().is_cuda()) {
-    throw;
+    return walk_edge_list_gpu(edge_list_indexed,node_edges_idx,target_nodes,p,q,walk_length,seed,padding_idx);
   }else{
     return walk_edge_list_cpu(edge_list_indexed,node_edges_idx,target_nodes,p,q,walk_length,seed,padding_idx);
   }

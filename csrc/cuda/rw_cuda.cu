@@ -4,6 +4,7 @@
 #include <curand.h>
 #include <curand_kernel.h>
 
+
 __device__ int64_t sample_neighbor_gpu(int64_t target_node,
                         const torch::PackedTensorAccessor64<int64_t,1> row_accessor,
                         const torch::PackedTensorAccessor64<int64_t,1> col_accessor,
