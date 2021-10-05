@@ -26,7 +26,7 @@ __device__ int64_t sample_neighbor_gpu(int64_t target_node,
       auto neighbor = col_accessor[nbr_idx];
       return neighbor;
     }else{
-      return -1;
+      return target_node;
     } 
 }
 
