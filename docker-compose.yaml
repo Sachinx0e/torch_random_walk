@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   torch-rw:
-    image: "sachinx0e/torch-rw:1.3"
+    image: "sachinx0e/torch-rw:1.2"
     container_name: "torch-rw"
     tty: true
     stdin_open: true
