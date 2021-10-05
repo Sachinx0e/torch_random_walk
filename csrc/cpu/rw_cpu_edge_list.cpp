@@ -55,6 +55,8 @@ bool is_neighbor(int64_t new_node,
       }
     }
 
+    return false;
+
   }
 
 }
