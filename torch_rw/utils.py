@@ -1,5 +1,6 @@
 import torch
 import networkx as nx
+import pandas as pd
 
 def to_csr(graph):
     csr = nx.to_scipy_sparse_matrix(graph,format='csr')    
@@ -56,8 +57,10 @@ def to_edge_list_indexed(graph):
 
 def build_node_edge_index(edge_list_indexed):
 
-    # sort the edge list
-    edge_list_indexed = torch.stack(sorted(edge_list_indexed, key=lambda a: a[0]))
+    # sort edge list
+    edge_list_indexed_pd = pd.DataFrame(data=edge_list_indexed.numpy(),columns=["head","tail"])
+    edge_list_indexed_np = edge_list_indexed_pd.sort_values(by="head",ascending=True).to_numpy()
+    edge_list_indexed = torch.from_numpy(edge_list_indexed_np).contiguous()
 
     # get unique nodes
     nodes_all = edge_list_indexed.view(-1)
