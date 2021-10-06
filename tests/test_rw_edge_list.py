@@ -26,7 +26,8 @@ class MainTest(unittest.TestCase):
         target_nodes = torch.Tensor(list(node_idx_map.values())).to(int).contiguous()
         
         # get node_edge_index
-        node_edge_index, edge_list_indexed_sorted = utils.build_node_edge_index(edge_list_indexed)
+        nodes_tensor = torch.unique(edge_list_indexed.view(-1))
+        node_edge_index, edge_list_indexed_sorted = utils.build_node_edge_index(edge_list_indexed,nodes_tensor)
         node_edge_index_gt = torch.Tensor([[ 0,  1],
                                             [ 2,  3],
                                             [-1, -1],
@@ -76,7 +77,8 @@ class MainTest(unittest.TestCase):
         target_nodes = torch.Tensor(list(node_idx_map.values())).to(int).contiguous()
         
         # get node_edge_index
-        node_edge_index, edge_list_indexed_sorted = utils.build_node_edge_index(edge_list_indexed)
+        nodes_tensor = torch.unique(edge_list_indexed.view(-1))
+        node_edge_index, edge_list_indexed_sorted = utils.build_node_edge_index(edge_list_indexed,nodes_tensor)
         node_edge_index_gt = torch.Tensor([[ 0,  1],
                                             [ 2,  3],
                                             [-1, -1],
@@ -130,7 +132,8 @@ class MainTest(unittest.TestCase):
         target_nodes = torch.Tensor(list(node_idx_map.values())).to(int).contiguous()
         
         # get node_edge_index
-        node_edge_index, edge_list_indexed_sorted = utils.build_node_edge_index(edge_list_indexed)
+        nodes_tensor = torch.unique(edge_list_indexed.view(-1))
+        node_edge_index, edge_list_indexed_sorted = utils.build_node_edge_index(edge_list_indexed,nodes_tensor)
 
         node_edge_index_gt = torch.Tensor([[ 0,  2],
                                             [ 3,  5],
@@ -180,7 +183,8 @@ class MainTest(unittest.TestCase):
         target_nodes = torch.Tensor(list(node_idx_map.values())).to(int).contiguous()
         
         # get node_edge_index
-        node_edge_index, edge_list_indexed_sorted = utils.build_node_edge_index(edge_list_indexed)
+        nodes_tensor = torch.unique(edge_list_indexed.view(-1))
+        node_edge_index, edge_list_indexed_sorted = utils.build_node_edge_index(edge_list_indexed,nodes_tensor)
 
         node_edge_index_gt = torch.Tensor([[ 0,  2],
                                             [ 3,  5],
@@ -235,7 +239,8 @@ class MainTest(unittest.TestCase):
         target_nodes = torch.Tensor(list(node_idx_map.values())).to(int).contiguous()
         
         # get node_edge_index
-        node_edge_index, edge_list_indexed_sorted = utils.build_node_edge_index(edge_list_indexed)
+        nodes_tensor = torch.unique(edge_list_indexed.view(-1))
+        node_edge_index, edge_list_indexed_sorted = utils.build_node_edge_index(edge_list_indexed,nodes_tensor)
         
         node_edge_index_gt = torch.Tensor([[ 0,  1],
                                             [ 2,  3],
@@ -285,7 +290,8 @@ class MainTest(unittest.TestCase):
         target_nodes = torch.Tensor(list(node_idx_map.values())).to(int).contiguous()
         
         # get node_edge_index
-        node_edge_index, edge_list_indexed_sorted = utils.build_node_edge_index(edge_list_indexed)
+        nodes_tensor = torch.unique(edge_list_indexed.view(-1))
+        node_edge_index, edge_list_indexed_sorted = utils.build_node_edge_index(edge_list_indexed,nodes_tensor)
         
         node_edge_index_gt = torch.Tensor([[ 0,  1],
                                             [ 2,  3],
@@ -339,7 +345,8 @@ class MainTest(unittest.TestCase):
         target_nodes = torch.Tensor(list(node_idx_map.values())).to(int).contiguous()
         
         # get node_edge_index
-        node_edge_index, edge_list_indexed_sorted = utils.build_node_edge_index(edge_list_indexed)
+        nodes_tensor = torch.unique(edge_list_indexed.view(-1))
+        node_edge_index, edge_list_indexed_sorted = utils.build_node_edge_index(edge_list_indexed,nodes_tensor)
         node_edge_index_gt = torch.Tensor([[ 0,  2],
                                             [ 3,  5],
                                             [ 6,  8],
@@ -389,7 +396,8 @@ class MainTest(unittest.TestCase):
         target_nodes = torch.Tensor(list(node_idx_map.values())).to(int).contiguous()
         
         # get node_edge_index
-        node_edge_index, edge_list_indexed_sorted = utils.build_node_edge_index(edge_list_indexed)
+        nodes_tensor = torch.unique(edge_list_indexed.view(-1))
+        node_edge_index, edge_list_indexed_sorted = utils.build_node_edge_index(edge_list_indexed,nodes_tensor)
         node_edge_index_gt = torch.Tensor([[ 0,  2],
                                             [ 3,  5],
                                             [ 6,  8],

@@ -55,16 +55,14 @@ def to_edge_list_indexed(graph):
 
     return edge_list_indexed, node_index_mapping
 
-def build_node_edge_index(edge_list_indexed):
+def build_node_edge_index(edge_list_indexed, nodes_tensor):
 
     # sort edge list
     edge_list_indexed_pd = pd.DataFrame(data=edge_list_indexed.numpy(),columns=["head","tail"])
     edge_list_indexed_np = edge_list_indexed_pd.sort_values(by="head",ascending=True).to_numpy()
     edge_list_indexed = torch.from_numpy(edge_list_indexed_np).contiguous()
 
-    # get unique nodes
-    nodes_all = edge_list_indexed.view(-1)
-    nodes_unique = torch.unique(nodes_all)
+    nodes_unique = torch.unique(nodes_tensor)
     nodes_sorted,_ = torch.sort(nodes_unique)
 
     num_nodes = len(nodes_sorted)
