@@ -29,14 +29,15 @@ torch::Tensor walk_edge_list(const torch::Tensor *edge_list_indexed,
                   const double q,
                   const int walk_length,
                   const int seed,
-                  const int64_t padding_idx
+                  const int64_t padding_idx,
+                  const bool restart
                 )
 {
 
   if(edge_list_indexed->device().is_cuda()) {
-    return walk_edge_list_gpu(edge_list_indexed,node_edges_idx,target_nodes,p,q,walk_length,seed,padding_idx);
+    return walk_edge_list_gpu(edge_list_indexed,node_edges_idx,target_nodes,p,q,walk_length,seed,padding_idx,restart);
   }else{
-    return walk_edge_list_cpu(edge_list_indexed,node_edges_idx,target_nodes,p,q,walk_length,seed,padding_idx);
+    return walk_edge_list_cpu(edge_list_indexed,node_edges_idx,target_nodes,p,q,walk_length,seed,padding_idx,restart);
   }
 }
 

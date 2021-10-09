@@ -46,7 +46,8 @@ __global__ void uniform_walk_edge_list_gpu(const torch::PackedTensorAccessor64<i
                   const int walk_length,
                   const int64_t padding_index,
                   const int64_t num_nodes,
-                  const int seed
+                  const int seed,
+                  const bool restart
                   ) {
     
     // get the thread
@@ -64,8 +65,13 @@ __global__ void uniform_walk_edge_list_gpu(const torch::PackedTensorAccessor64<i
         // get the target node
         int64_t target_node = target_nodes_accesor[thread_index];
 
-        // define jump node
-        auto jump_node = target_node;
+        // set the jump node according to restart policy
+        int64_t jump_node = 0;
+        if(restart == true){
+          jump_node = target_node;
+        }else{
+          jump_node = padding_index;
+        }
 
         // add target node as the first node in walk
         walks_for_node[0] = target_node;
@@ -126,7 +132,8 @@ __global__ void biased_walk_edge_list_gpu(const torch::PackedTensorAccessor64<in
                   const int walk_length,
                   const int64_t padding_index,
                   const int64_t num_nodes,
-                  const int seed
+                  const int seed,
+                  const bool restart
                   ) {
     
     // get the thread
@@ -152,8 +159,13 @@ __global__ void biased_walk_edge_list_gpu(const torch::PackedTensorAccessor64<in
     // get the target node
     int64_t target_node = target_nodes_accesor[thread_index];
 
-    // define jump node
-    int64_t jump_node = target_node;
+    // set the jump node according to restart policy
+    int64_t jump_node = 0;
+    if(restart == true){
+      jump_node = target_node;
+    }else{
+      jump_node = padding_index;
+    }
 
     // add target node as the first node in walk
     walks_for_node[0] = target_node;
@@ -198,7 +210,7 @@ __global__ void biased_walk_edge_list_gpu(const torch::PackedTensorAccessor64<in
         // if new_node is a padding_idx then restart
         if(new_node == padding_index){
             if(random_prob < prob_0){
-                selected_node = target_node;
+                selected_node = jump_node;
                 break;
             }
         }
@@ -235,7 +247,8 @@ torch::Tensor walk_edge_list_gpu(const torch::Tensor *edge_list_indexed,
                   const double q,
                   const int walk_length,
                   const int seed,
-                  const int64_t padding_idx                  
+                  const int64_t padding_idx,
+                  const bool restart                  
                 ) {
 
   CHECK_CUDA((*edge_list_indexed));
@@ -274,7 +287,8 @@ torch::Tensor walk_edge_list_gpu(const torch::Tensor *edge_list_indexed,
                                                                     walk_size,
                                                                     padding_idx,
                                                                     num_nodes,
-                                                                    seed
+                                                                    seed,
+                                                                    restart
                                                                 );
   }else{
     biased_walk_edge_list_gpu<<<NUM_BLOCKS,NUM_THREADS,0,stream>>>(walks_accessor,
@@ -286,7 +300,8 @@ torch::Tensor walk_edge_list_gpu(const torch::Tensor *edge_list_indexed,
                                                                     walk_size,
                                                                     padding_idx,
                                                                     num_nodes,
-                                                                    seed
+                                                                    seed,
+                                                                    restart
                                                                 );
   }
   return walks;

@@ -7,5 +7,6 @@ torch::Tensor walk_edge_list_cpu(const torch::Tensor *edge_list,
                   const double q,
                   const int walk_length,
                   const int seed,
-                  const int64_t padding_idx
+                  const int64_t padding_idx,
+                  const bool restart
                 );

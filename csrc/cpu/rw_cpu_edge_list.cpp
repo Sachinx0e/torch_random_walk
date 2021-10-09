@@ -29,7 +29,7 @@ int64_t sample_neighbor(int64_t target_node,
       return nbr_id;
     }
   }else{
-    // restart the walk from first node
+    // restart the walk from jump
     return jump_node;
   }
 }
@@ -66,8 +66,9 @@ void uniform_walk_edge_list(const torch::Tensor *walks,
                   const torch::Tensor *node_edge_index,
                   const torch::Tensor *target_nodes,
                   const int seed,
-                  const int64_t padding_idx
-                  ) {
+                  const int64_t padding_idx,
+                  const bool restart
+                ) {
     // seed
     srand(seed);
 
@@ -98,6 +99,14 @@ void uniform_walk_edge_list(const torch::Tensor *walks,
           // get the target node
           int64_t target_node = target_nodes_accessor[node_index];
 
+          // set the jump node according to restart policy
+          int64_t jump_node = 0;
+          if(restart == true){
+            jump_node = target_node;
+          }else{
+            jump_node = padding_idx;
+          }
+
           // add target node as the first node in walk
           walks_for_node[0] = target_node;
 
@@ -105,7 +114,7 @@ void uniform_walk_edge_list(const torch::Tensor *walks,
           int64_t previous_node = target_node;
           for (int64_t walk_step=1;walk_step < walk_length;walk_step++){
             // sample a neighor
-            int64_t next_node = sample_neighbor(previous_node,target_node,node_edge_index_accessor,edge_list_accessor,padding_idx);
+            int64_t next_node = sample_neighbor(previous_node,jump_node,node_edge_index_accessor,edge_list_accessor,padding_idx);
             walks_for_node[walk_step] = next_node;
 
             // update previous node
@@ -123,7 +132,9 @@ void biased_walk_edge_list(const torch::Tensor *walks,
                   const double p,
                   const double q,
                   const int seed,
-                  const int64_t padding_idx) {
+                  const int64_t padding_idx,
+                  const bool restart
+                  ) {
     
     // seed
     srand(seed);
@@ -150,6 +161,7 @@ void biased_walk_edge_list(const torch::Tensor *walks,
     double prob_1 = 1.0/max_prob;
     double prob_2 = 1.0/q/max_prob;
 
+    
   
     // loop in parallel
     torch::parallel_for(0,num_nodes,grain_size,[&](int64_t node_start,int64_t node_end){
@@ -161,11 +173,19 @@ void biased_walk_edge_list(const torch::Tensor *walks,
           // get the target node
           int64_t target_node = target_nodes_accessor[node_index];
 
+          // set the jump node according to restart policy
+          int64_t jump_node = 0;
+          if(restart == true){
+            jump_node = target_node;
+          }else{
+            jump_node = padding_idx;
+          }
+
           // add target node as the first node in walk
           walks_for_node[0] = target_node;
 
           // sample the first neighbor
-          walks_for_node[1] = sample_neighbor(target_node,target_node,node_edge_index_accessor,edge_list_accessor,padding_idx);
+          walks_for_node[1] = sample_neighbor(target_node,jump_node,node_edge_index_accessor,edge_list_accessor,padding_idx);
 
           // start walk
           int64_t previous_node = walks_for_node[1];
@@ -174,7 +194,7 @@ void biased_walk_edge_list(const torch::Tensor *walks,
             int64_t selected_node = -1;
             while(true) {
               // sample a new neighbor
-              int64_t new_node = sample_neighbor(previous_node,target_node,node_edge_index_accessor,edge_list_accessor,padding_idx);
+              int64_t new_node = sample_neighbor(previous_node,jump_node,node_edge_index_accessor,edge_list_accessor,padding_idx);
               auto random_prob = ((double)rand()/(double)RAND_MAX);
 
               // t_node
@@ -191,7 +211,7 @@ void biased_walk_edge_list(const torch::Tensor *walks,
               // if new_node is a padding_idx then restart
               if(new_node == padding_idx){
                 if(random_prob < prob_0){
-                    selected_node = target_node;
+                    selected_node = jump_node;
                     break;
                 }
               }
@@ -224,7 +244,8 @@ torch::Tensor walk_edge_list_cpu(const torch::Tensor *edge_list_indexed,
                   const double q,
                   const int walk_length,
                   const int seed,
-                  const int64_t padding_idx                  
+                  const int64_t padding_idx,
+                  const bool restart                  
                 ) {
 
   CHECK_CPU((*edge_list_indexed));
@@ -237,9 +258,9 @@ torch::Tensor walk_edge_list_cpu(const torch::Tensor *edge_list_indexed,
   
   // perform walks
   if(p == 1.0 && q == 1.0){
-    uniform_walk_edge_list(&walks,edge_list_indexed,node_edges_idx,target_nodes,seed,padding_idx);
+    uniform_walk_edge_list(&walks,edge_list_indexed,node_edges_idx,target_nodes,seed,padding_idx,restart);
   }else{
-    biased_walk_edge_list(&walks,edge_list_indexed,node_edges_idx,target_nodes,p,q,seed,padding_idx);
+    biased_walk_edge_list(&walks,edge_list_indexed,node_edges_idx,target_nodes,p,q,seed,padding_idx,restart);
   }
   return walks;
 }
