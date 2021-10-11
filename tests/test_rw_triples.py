@@ -129,7 +129,10 @@ class TriplesTest(unittest.TestCase):
 
         target_nodes = target_nodes.repeat_interleave(2,0)
 
-        
+        # move to gpu
+        target_nodes = target_nodes.cuda()
+        relation_tail_index = relation_tail_index.cuda()
+        triples_tensor_sorted = triples_tensor_sorted.cuda()
 
         # perform walk
         walks = rw.walk_triples(triples_indexed=triples_tensor_sorted,
@@ -141,6 +144,8 @@ class TriplesTest(unittest.TestCase):
                                 restart=False
                                 )
         
+        print(walks)
+
         walks_gt = torch.Tensor([[0, 5, 2, 6, 4, 8, 8, 8, 8, 8, 8, 8, 8],
                                 [0, 6, 3, 6, 2, 6, 4, 8, 8, 8, 8, 8, 8],
                                 [1, 6, 3, 6, 2, 7, 1, 6, 3, 6, 2, 7, 1],
@@ -152,7 +157,7 @@ class TriplesTest(unittest.TestCase):
                                 [4, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
                                 [4, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]]).to(int)
 
-        self.assertTrue(torch.equal(walks,walks_gt),"Triple walks on cpu do not match the ground truth")
+        self.assertTrue(torch.equal(walks,walks_gt),"Triple walks on gpu do not match the ground truth")
         
 
 if __name__ == '__main__':

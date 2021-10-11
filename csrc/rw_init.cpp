@@ -1,11 +1,12 @@
 #include <torch/extension.h>
 #include "cpu/rw_cpu.h"
 #include "cpu/rw_cpu_edge_list.h"
-#include "cpu/rw_cpu_triples.h"
 #include "cuda/rw_cuda_edge_list.h"
 #include "cuda/rw_cuda.h"
 #include "cpu/windows_cpu.h"
 #include "cuda/windows_cuda.h"
+#include "cpu/rw_cpu_triples.h"
+#include "cuda/rw_cuda_triples.h"
 
 torch::Tensor walk(const torch::Tensor *row_ptr,
                   const torch::Tensor *column_idx,
@@ -54,7 +55,13 @@ torch::Tensor walk_triples(const torch::Tensor *triples_indexed,
 {
 
   if(target_nodes->device().is_cuda()) {
-    //return walk_triples_gpu(triples_indexed,relation_tail_index,target_nodes,p,q,walk_length,seed,padding_idx,restart);
+    return triples::walk_triples_gpu(triples_indexed,
+                                    relation_tail_index,
+                                    target_nodes,
+                                    walk_length,
+                                    padding_idx,
+                                    restart,
+                                    seed);
   }else{
     return triples::walk_triples_cpu(triples_indexed,
                                      relation_tail_index,

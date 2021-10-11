@@ -63,8 +63,6 @@ namespace triples {
 
       // get the walk length
       int64_t walk_length = (*walks).size(1);
-
-      printf("Walk length: %d \n",walk_length);
       
       // get the number of nodes
       int64_t num_nodes = (*target_nodes).size(0);
