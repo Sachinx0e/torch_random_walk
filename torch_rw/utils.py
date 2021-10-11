@@ -88,20 +88,15 @@ def build_node_edge_index(edge_list_indexed, nodes_tensor):
     
     return node_edge_index, edge_list_indexed
 
-def build_relation_tail_index(triples_indexed_tensor):
+def build_relation_tail_index(triples_indexed_tensor,all_entities_tensor):
 
     # sort edge list
     triples_indexed_pd = pd.DataFrame(data=triples_indexed_tensor.numpy(),columns=["head","relation","tail"])
     triples_indexed_pd = triples_indexed_pd.sort_values(by="head",ascending=True)    
     triples_indexed_tensor = torch.from_numpy(triples_indexed_pd.to_numpy()).to(int).contiguous()
-    
-    # get unique nodes
-    heads = triples_indexed_pd["head"].to_list()
-    tails = triples_indexed_pd["tail"].to_list()
-    nodes_unique = list(set(heads+tails))
 
-    nodes_unique_tensor = torch.Tensor(nodes_unique).to(int)
-    nodes_sorted,_ = torch.sort(nodes_unique_tensor)
+    # sorted entities    
+    nodes_sorted,_ = torch.sort(all_entities_tensor)
 
     num_nodes = len(nodes_sorted)
     num_edges = len(triples_indexed_tensor)
