@@ -7,7 +7,7 @@ import unittest
 from loguru import logger
 
 
-class MainTest(unittest.TestCase):
+class EdgeListTest(unittest.TestCase):
 
     def test_uniform_walk_edge_list_cpu(self):
         graph = nx.DiGraph()

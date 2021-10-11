@@ -1,5 +1,6 @@
-#include <torch/extension.h>
+#pragma once
 
+#include <torch/extension.h>
 torch::Tensor walk_gpu(const torch::Tensor *row_ptr,
                   const torch::Tensor *column_idx,
                   const torch::Tensor *target_nodes,

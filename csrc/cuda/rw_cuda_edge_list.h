@@ -1,3 +1,4 @@
+#pragma once
 #include <torch/extension.h>
 
 torch::Tensor walk_edge_list_gpu(const torch::Tensor *edge_list,

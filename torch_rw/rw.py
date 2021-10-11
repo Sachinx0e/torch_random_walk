@@ -13,7 +13,18 @@ def walk_edge_list(edge_list_indexed, node_edge_index,target_nodes, p, q, walk_l
                                           seed,
                                           padding_idx,
                                           restart
-                                        ) 
+                                        )
+
+def walk_triples(triples_indexed, relation_tail_index,target_nodes, walk_length,padding_idx,seed,restart=True):
+    return torch_rw_native.walk_triples(triples_indexed,
+                                          relation_tail_index,
+                                          target_nodes,
+                                          walk_length,
+                                          padding_idx,
+                                          restart,
+                                          seed
+                                        )                            
+
 
 def to_windows(walks, window_size, num_nodes,seed):
     return torch_rw_native.to_windows(walks, window_size, num_nodes,seed)

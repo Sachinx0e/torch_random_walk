@@ -24,7 +24,7 @@ def get_neighbors(node, nodes, row_ptr, col_idx):
 
     return neighbors_name    
 
-class MainTest(unittest.TestCase):
+class CSRTest(unittest.TestCase):
 
 
     def test_uniform_walk_cpu(self):

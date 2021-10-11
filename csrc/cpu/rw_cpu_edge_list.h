@@ -1,5 +1,6 @@
-#include <torch/extension.h>
+#pragma once
 
+#include <torch/extension.h>
 torch::Tensor walk_edge_list_cpu(const torch::Tensor *edge_list,
                   const torch::Tensor *node_range_mapping,
                   const torch::Tensor *target_nodes,

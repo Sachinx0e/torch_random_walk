@@ -87,6 +87,42 @@ def build_node_edge_index(edge_list_indexed, nodes_tensor):
                 node_edge_index[head][1] = edge_index
     
     return node_edge_index, edge_list_indexed
+
+def build_relation_tail_index(triples_indexed_tensor):
+
+    # sort edge list
+    triples_indexed_pd = pd.DataFrame(data=triples_indexed_tensor.numpy(),columns=["head","relation","tail"])
+    triples_indexed_pd = triples_indexed_pd.sort_values(by="head",ascending=True)    
+    triples_indexed_tensor = torch.from_numpy(triples_indexed_pd.to_numpy()).to(int).contiguous()
+    
+    # get unique nodes
+    heads = triples_indexed_pd["head"].to_list()
+    tails = triples_indexed_pd["tail"].to_list()
+    nodes_unique = list(set(heads+tails))
+
+    nodes_unique_tensor = torch.Tensor(nodes_unique).to(int)
+    nodes_sorted,_ = torch.sort(nodes_unique_tensor)
+
+    num_nodes = len(nodes_sorted)
+    num_edges = len(triples_indexed_tensor)
+    node_edge_index = torch.full((num_nodes,2),-1).to(int).contiguous()
+
+    current_node = triples_indexed_tensor[0][0]
+    for edge_index in range(num_edges):
+        edge = triples_indexed_tensor[edge_index]
+        head = edge[0]
+
+        if head != current_node:
+            node_edge_index[current_node][1] = edge_index - 1
+            node_edge_index[head] = edge_index
+            current_node = head
+        else:
+            if edge_index == 0:
+                node_edge_index[head][0] = 0
+            else:
+                node_edge_index[head][1] = edge_index
+    
+    return node_edge_index, triples_indexed_tensor
             
 
             

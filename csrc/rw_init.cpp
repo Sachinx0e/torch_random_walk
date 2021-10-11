@@ -1,6 +1,7 @@
 #include <torch/extension.h>
 #include "cpu/rw_cpu.h"
 #include "cpu/rw_cpu_edge_list.h"
+#include "cpu/rw_cpu_triples.h"
 #include "cuda/rw_cuda_edge_list.h"
 #include "cuda/rw_cuda.h"
 #include "cpu/windows_cpu.h"
@@ -39,6 +40,31 @@ torch::Tensor walk_edge_list(const torch::Tensor *edge_list_indexed,
   }else{
     return walk_edge_list_cpu(edge_list_indexed,node_edges_idx,target_nodes,p,q,walk_length,seed,padding_idx,restart);
   }
+
+}
+
+torch::Tensor walk_triples(const torch::Tensor *triples_indexed,
+                  const torch::Tensor *relation_tail_index,
+                  const torch::Tensor *target_nodes,
+                  const int walk_length,
+                  const int64_t padding_idx,
+                  const bool restart,
+                  const int seed
+                )
+{
+
+  if(target_nodes->device().is_cuda()) {
+    //return walk_triples_gpu(triples_indexed,relation_tail_index,target_nodes,p,q,walk_length,seed,padding_idx,restart);
+  }else{
+    return triples::walk_triples_cpu(triples_indexed,
+                                     relation_tail_index,
+                                     target_nodes,
+                                     walk_length,
+                                     padding_idx,
+                                     restart,
+                                     seed);
+  }
+  
 }
 
 std::tuple<at::Tensor, at::Tensor, at::Tensor> to_windows(const torch::Tensor *walks,
@@ -57,5 +83,6 @@ std::tuple<at::Tensor, at::Tensor, at::Tensor> to_windows(const torch::Tensor *w
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   m.def("walk", &walk, "walk");
   m.def("walk_edge_list", &walk_edge_list, "walk_edge_list");
+  m.def("walk_triples", &walk_triples, "walk_triples");
   m.def("to_windows",&to_windows,"to_windows");
 }

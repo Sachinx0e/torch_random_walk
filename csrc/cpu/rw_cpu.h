@@ -1,3 +1,5 @@
+#pragma once
+
 #include <torch/extension.h>
 
 torch::Tensor walk_cpu(const torch::Tensor *row_ptr,
