@@ -4,16 +4,11 @@
 #include <random>
 #include "../cuda/utils.cuh"
 #include "cpu_utils.h"
+#include "../utils.h"
 
 namespace triples {
 
-  struct RelationTail { 
-    int64_t relation;
-    int64_t tail; 
-  };
-
   RelationTail sample_neighbor(int64_t target_node,
-                        int64_t jump_node,
                         const torch::TensorAccessor<int64_t,2> relation_tail_index,
                         const torch::TensorAccessor<int64_t,2> triples_indexed,
                         int64_t padding_index
@@ -87,9 +82,6 @@ namespace triples {
             
             // get the target node
             int64_t target_node = target_nodes_accessor[node_index];
-
-            // set the jump node according to restart policy
-            int64_t jump_node = target_node;
             
             // add target node as the first node in walk
             walks_for_node[0] = target_node;
@@ -98,7 +90,7 @@ namespace triples {
             int64_t previous_node = target_node;
             for (int64_t walk_step=1;walk_step < walk_length;walk_step=walk_step+2){
               // sample a neighor
-              auto next_rt = sample_neighbor(previous_node,jump_node,relation_tail_index_accessor,triples_indexed_accessor,padding_idx);
+              auto next_rt = sample_neighbor(previous_node,relation_tail_index_accessor,triples_indexed_accessor,padding_idx);
               walks_for_node[walk_step] = next_rt.relation;
               walks_for_node[walk_step+1] = next_rt.tail;
               

@@ -128,7 +128,7 @@ class TriplesTest(unittest.TestCase):
         padding_idx = r3 + 1
 
         target_nodes = target_nodes.repeat_interleave(2,0)
-
+        
         # move to gpu
         target_nodes = target_nodes.cuda()
         relation_tail_index = relation_tail_index.cuda()
@@ -143,19 +143,18 @@ class TriplesTest(unittest.TestCase):
                                 padding_idx=padding_idx,
                                 restart=False
                                 )
-        
-        print(walks)
 
-        walks_gt = torch.Tensor([[0, 5, 2, 6, 4, 8, 8, 8, 8, 8, 8, 8, 8],
-                                [0, 6, 3, 6, 2, 6, 4, 8, 8, 8, 8, 8, 8],
-                                [1, 6, 3, 6, 2, 7, 1, 6, 3, 6, 2, 7, 1],
-                                [1, 6, 3, 6, 2, 7, 1, 6, 3, 6, 2, 6, 4],
-                                [2, 7, 1, 6, 3, 7, 0, 5, 2, 6, 4, 8, 8],
+     
+        walks_gt = torch.Tensor([[0, 5, 1, 6, 3, 6, 2, 7, 1, 6, 3, 6, 2],
+                                [0, 5, 2, 6, 4, 8, 8, 8, 8, 8, 8, 8, 8],
+                                [1, 6, 3, 7, 0, 5, 1, 6, 3, 7, 0, 5, 2],
+                                [1, 6, 3, 7, 0, 5, 2, 6, 4, 8, 8, 8, 8],
                                 [2, 6, 4, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
-                                [3, 6, 2, 6, 4, 8, 8, 8, 8, 8, 8, 8, 8],
-                                [3, 7, 0, 5, 2, 7, 1, 6, 3, 6, 2, 6, 4],
+                                [2, 7, 1, 6, 3, 6, 2, 6, 4, 8, 8, 8, 8],
+                                [3, 7, 0, 5, 1, 6, 3, 6, 2, 7, 1, 6, 3],
+                                [3, 7, 0, 5, 1, 6, 3, 7, 0, 5, 1, 6, 3],
                                 [4, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
-                                [4, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]]).to(int)
+                                [4, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]],).to(int).cuda()
 
         self.assertTrue(torch.equal(walks,walks_gt),"Triple walks on gpu do not match the ground truth")
         
