@@ -1,5 +1,6 @@
 #include "windows_cpu.h"
 #include "../cuda/utils.cuh"
+#include "cpu_utils.h"
 
 std::tuple<at::Tensor, at::Tensor, at::Tensor> to_windows_cpu(const torch::Tensor *walks,
                         const int window_size,
@@ -73,4 +74,155 @@ std::tuple<at::Tensor, at::Tensor, at::Tensor> to_windows_cpu(const torch::Tenso
     });
         
     return std::make_tuple(target_nodes,pos_windows,neg_windows);
+}
+
+std::tuple<at::Tensor, at::Tensor, at::Tensor> to_windows_triples_cpu(const torch::Tensor *walks,
+                        const int window_size,
+                        const int64_t num_nodes,
+                        const int64_t padding_idx,
+                        const torch::Tensor *triples,
+                        const int seed
+                    ){
+
+    // seed
+    srand(seed);
+
+    // check walks is contiguous
+    CHECK_CONTIGUOUS(walks);
+
+    // calculate sizes
+    int64_t num_walks = walks->size(0);
+    int64_t walk_length = walks->size(1);
+    int64_t num_windows_in_one_walk = (walk_length - 1)/2; 
+    int64_t num_windows_for_all_walks = num_windows_in_one_walk*num_walks;
+    int64_t num_triples = triples->size(0);
+
+    // create arrays to hold results
+    auto target_triples = torch::empty({num_windows_for_all_walks,3},torch::kInt64);
+    auto pos_windows = torch::empty({num_windows_for_all_walks,window_size*2,3},torch::kInt64);
+    auto neg_windows = torch::empty({num_windows_for_all_walks,window_size*2,3},torch::kInt64);
+
+    // grain size
+    int grain_size = torch::internal::GRAIN_SIZE / num_walks;
+
+    // create accessors
+    auto walks_accessor = walks->accessor<int64_t,2>();
+    auto target_triples_accessor = target_triples.accessor<int64_t,2>();
+    auto pos_windows_accesor = pos_windows.accessor<int64_t,3>();
+    auto neg_windows_accesor = neg_windows.accessor<int64_t,3>();
+    auto triples_accesor = triples->accessor<int64_t,2>();
+
+    // do work
+    torch::parallel_for(0,num_walks,grain_size,[&](int64_t walk_idx_start,int64_t walk_idx_end){
+        
+        // loop over walks
+        for (int64_t walk_idx = 0;walk_idx < num_walks;walk_idx++){
+            
+            // get the walk at this index
+            auto walk = walks_accessor[walk_idx];
+
+            
+            // hop by two steps
+            int64_t target_index = 0;
+            for(int64_t target_rel_index=1;target_rel_index<walk_length-1;target_rel_index+=2){
+                                
+                // calculate the position in target triples tensor
+                auto target_pos = (num_windows_in_one_walk * walk_idx) + target_index;
+
+
+                // get the target triple
+                target_triples_accessor[target_pos][0] = walk[target_rel_index -1];     // Head
+                target_triples_accessor[target_pos][1] = walk[target_rel_index];         // Relation
+                target_triples_accessor[target_pos][2] = walk[target_rel_index + 1];     // Tail
+
+                // get left positive windows
+                for(int64_t hop=0;hop<=window_size;hop++){
+                                
+                    // get head
+                    auto rel_idx = target_rel_index - ((hop + 1)*2);
+                    auto head_idx = rel_idx - 1;
+                    auto tail_idx = rel_idx + 1;
+                                         
+                    // head node
+                    if(head_idx >= 0){
+                        pos_windows_accesor[target_pos][hop][0] = walk[rel_idx];;
+                    }else{
+                        pos_windows_accesor[target_pos][hop][0] = padding_idx;
+                    }
+
+                    // rel node
+                    if(rel_idx >= 0){
+                        pos_windows_accesor[target_pos][hop][1] = walk[rel_idx];
+                    }else{
+                        pos_windows_accesor[target_pos][hop][1] = padding_idx;
+                    }
+
+                    // tail node
+                    if(tail_idx >= 0){
+                        pos_windows_accesor[target_pos][hop][2] = walk[tail_idx];
+                    }else{
+                        pos_windows_accesor[target_pos][hop][2] = padding_idx;
+                    }
+
+                }
+
+                // get right positive windows
+                for(int64_t hop=0;hop<window_size;hop++){
+                                
+                    // window item position
+                    auto window_item_pos = hop+window_size;
+
+                    // get head
+                    auto rel_idx = target_rel_index + ((hop + 1)*2);
+                    auto head_idx = rel_idx - 1;
+                    auto tail_idx = rel_idx + 1;
+
+                    //printf("Hop index: %d / Target rel index: %d / Rel index: %d \n",hop,target_rel_index, rel_idx);                    
+                                         
+                    // head node
+                    if(head_idx < walk_length){
+                        pos_windows_accesor[target_pos][window_item_pos][0] = walk[head_idx];;
+                    }else{
+                        pos_windows_accesor[target_pos][window_item_pos][0] = padding_idx;
+                    }
+
+                    // rel node
+                    if(rel_idx < walk_length){
+                        pos_windows_accesor[target_pos][window_item_pos][1] = walk[rel_idx];
+                    }else{
+                        pos_windows_accesor[target_pos][window_item_pos][1] = padding_idx;
+                    }
+
+                    // tail node
+                    if(tail_idx < walk_length){
+                        pos_windows_accesor[target_pos][window_item_pos][2] = walk[tail_idx];
+                    }else{
+                        pos_windows_accesor[target_pos][window_item_pos][2] = padding_idx;
+                    }
+
+                }
+                
+
+                // create negatives
+                for(int64_t hop=0;hop<(window_size*2);hop++){
+                    
+                    auto triple_idx = sample_int(0,(num_triples-1));
+
+                    auto triple = triples_accesor[triple_idx];
+
+                    // decide what to corrupt
+                    neg_windows_accesor[target_pos][hop][0] = triple[0];
+                    neg_windows_accesor[target_pos][hop][1] = triple[1];
+                    neg_windows_accesor[target_pos][hop][2] = triple[2];
+                
+                }
+
+                // update target index
+                target_index = target_index + 1;
+
+            }
+        }
+    });
+        
+    return std::make_tuple(target_triples,pos_windows,neg_windows);
 }

@@ -69,6 +69,7 @@
         "__tree": "cpp",
         "queue": "cpp",
         "stack": "cpp",
-        "bit": "cpp"
+        "bit": "cpp",
+        "filesystem": "cpp"
     }
 }
