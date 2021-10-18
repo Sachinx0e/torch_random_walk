@@ -9,12 +9,7 @@
 
 
 namespace triples {
-    
-    __device__ int64_t sample_int_gpu(int64_t start, int64_t end,curandState_t* rand_state){
-        auto sampled_int = start + (curand(rand_state) % (((end + 1) - start)));
-        return sampled_int;
-    }
-      
+  
     __device__ RelationTail sample_neighbor_gpu(int64_t target_node,
                         int64_t padding_index,
                         const torch::PackedTensorAccessor64<int64_t,2> relation_tail_index,

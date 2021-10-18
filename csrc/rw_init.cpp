@@ -96,7 +96,7 @@ std::tuple<at::Tensor, at::Tensor, at::Tensor> to_windows_triples(const torch::T
                                     )
 {
   if(walks->device().is_cuda()) {
-    throw;
+    return to_windows_triples_gpu(walks,window_size,num_nodes,padding_idx,triples,seed);
   }else{
     return to_windows_triples_cpu(walks,window_size,num_nodes,padding_idx,triples,seed);
   }
