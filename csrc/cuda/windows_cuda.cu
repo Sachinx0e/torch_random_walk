@@ -496,6 +496,8 @@ __global__ void create_windows_triples_cbow(torch::PackedTensorAccessor64<int64_
                 neg_head = triples_accesor[neg_triple_idx][0];
                 neg_rel = triples_accesor[neg_triple_idx][1];
                 neg_tail = triples_accesor[neg_triple_idx][2];
+
+                max_checks = max_checks + 1;
             }
 
             neg_triples_accesor[target_pos][0] = neg_head;
