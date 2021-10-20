@@ -32,3 +32,6 @@ def to_windows(walks, window_size, num_nodes,seed):
 def to_windows_triples(walks, window_size, num_nodes,padding_idx,triples,seed):
     return torch_rw_native.to_windows_triples(walks, window_size,num_nodes,padding_idx,triples,seed)
 
+def to_windows_triples_cbow(walks, window_size, num_nodes,padding_idx,triples,seed):
+    return torch_rw_native.to_windows_triples_cbow(walks, window_size,num_nodes,padding_idx,triples,seed)
+
