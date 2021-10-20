@@ -29,6 +29,9 @@ def walk_triples(triples_indexed, relation_tail_index,target_nodes, walk_length,
 def to_windows(walks, window_size, num_nodes,seed):
     return torch_rw_native.to_windows(walks, window_size, num_nodes,seed)
 
+def to_windows_cbow(walks, window_size, num_nodes,seed):
+    return torch_rw_native.to_windows_cbow(walks, window_size, num_nodes,seed)
+
 def to_windows_triples(walks, window_size, num_nodes,padding_idx,triples,seed):
     return torch_rw_native.to_windows_triples(walks, window_size,num_nodes,padding_idx,triples,seed)
 

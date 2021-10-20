@@ -87,6 +87,19 @@ std::tuple<at::Tensor, at::Tensor, at::Tensor> to_windows(const torch::Tensor *w
   }
 }
 
+std::tuple<at::Tensor, at::Tensor, at::Tensor> to_windows_cbow(const torch::Tensor *walks,
+                                      const int window_size,
+                                      const int64_t num_nodes,
+                                      const int seed
+                                    )
+{
+  if(walks->device().is_cuda()) {
+    return to_windows_cbow_gpu(walks,window_size,num_nodes,seed);
+  }else{
+    return to_windows_cbow_cpu(walks,window_size,num_nodes,seed);
+  }
+}
+
 std::tuple<at::Tensor, at::Tensor, at::Tensor> to_windows_triples(const torch::Tensor *walks,
                                       const int window_size,
                                       const int64_t num_nodes,
@@ -122,6 +135,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   m.def("walk_edge_list", &walk_edge_list, "walk_edge_list");
   m.def("walk_triples", &walk_triples, "walk_triples");
   m.def("to_windows",&to_windows,"to_windows");
+  m.def("to_windows_cbow",&to_windows_cbow,"to_windows");
   m.def("to_windows_triples",&to_windows_triples,"to_windows_triples");
   m.def("to_windows_triples_cbow",&to_windows_triples_cbow,"to_windows_triples_cbow");
 }

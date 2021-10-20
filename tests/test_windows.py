@@ -31,6 +31,30 @@ def test_to_windows_cpu():
     assert torch.equal(neg_windows[:6],neg_windows_expected)
 
 
+def test_to_windows_cbow_cpu():
+    # create an array of walks
+    torch.manual_seed(20)
+    walks = torch.randint(low=0,high=30,size=(3,10))
+
+    # to windows
+    pos_nodes, neg_nodes, windows = rw.to_windows_cbow(walks=walks,window_size=5,num_nodes=30,seed=20)
+ 
+    assert pos_nodes.size(0) == 6*3
+    
+    pos_nodes_expected = torch.Tensor([27, 13, 24, 20, 13,  6]).to(int)
+    neg_nodes_expected = torch.Tensor([ 1, 18, 17,  9, 26,  1]).to(int)
+    windows_expected = torch.Tensor([[11, 10, 13, 24],
+                                    [10, 27, 24, 20],
+                                    [27, 13, 20, 13],
+                                    [13, 24, 13,  6],
+                                    [24, 20,  6, 27],
+                                    [20, 13, 27,  0]]).to(int)
+
+    assert torch.equal(pos_nodes[:6],pos_nodes_expected)
+    assert torch.equal(neg_nodes[:6],neg_nodes_expected)
+    assert torch.equal(windows[:6],windows_expected)
+
+
 def test_to_windows_gpu():
     # create an array of walks
     torch.manual_seed(20)
@@ -69,6 +93,30 @@ def test_to_windows_gpu():
     assert torch.equal(target_nodes[:6],target_nodes_expected)
     assert torch.equal(pos_windows[:6],pos_windows_expected)
     assert torch.equal(neg_windows[:6],neg_windows_expected)
+
+
+def test_to_windows_cbow_gpu():
+    # create an array of walks
+    torch.manual_seed(20)
+    walks = torch.randint(low=0,high=30,size=(3,10)).cuda()
+
+    # to windows
+    pos_nodes, neg_nodes, windows = rw.to_windows_cbow(walks=walks,window_size=5,num_nodes=30,seed=20)
+ 
+    assert pos_nodes.size(0) == 6*3
+    
+    pos_nodes_expected = torch.Tensor([27, 13, 24, 20, 13,  6]).to(int).cuda()
+    neg_nodes_expected = torch.Tensor([11, 27, 29, 14,  1, 12]).to(int).cuda()
+    windows_expected = torch.Tensor([[11, 10, 13, 24],
+                                    [10, 27, 24, 20],
+                                    [27, 13, 20, 13],
+                                    [13, 24, 13,  6],
+                                    [24, 20,  6, 27],
+                                    [20, 13, 27,  0]]).to(int).cuda()
+
+    assert torch.equal(pos_nodes[:6],pos_nodes_expected)
+    assert torch.equal(neg_nodes[:6],neg_nodes_expected)
+    assert torch.equal(windows[:6],windows_expected)
 
 
 def test_to_windows_triples_cpu():
